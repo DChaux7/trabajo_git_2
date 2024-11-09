@@ -3,14 +3,17 @@ package iug;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+
+import persistencia.Conexion;
 
 public class Login {
     // Creacion de componentes
     private JTextField cctf;
-    private JPasswordField passtf;
     private JButton btn;
     private JPanel main;
     private JPanel login;
+    private JPasswordField passtf;
 
     // Ejecuta init
     public Login(){
@@ -19,9 +22,6 @@ public class Login {
     // configuracion de los componentes
     private void init(){
 
-        Integer cc = 1122332211;
-        String password = "pass2";
-
         // Configuracion de la vista
         JFrame jFrame = new JFrame();
         jFrame.setSize(400,400);
@@ -29,8 +29,6 @@ public class Login {
         jFrame.setVisible(true);
         jFrame.add(main);
 
-        cctf.setText(String.valueOf(cc));
-        passtf.setText(password);
 
         // Boton de Validacion
         btn.addActionListener(new ActionListener() {
@@ -46,9 +44,19 @@ public class Login {
                     char[] p = passtf.getPassword();
                     String validarPass = String.valueOf(p);
 
+                    String consulta = "SELECT * FROM usuario Where cc = "+Integer.valueOf(cctf.getText())+" and contraseña = '"+validarPass+"'";
+                    Conexion conexion = new Conexion();
+                    Connection con = conexion.getConexion();
+                    String[] result = conexion.validar(consulta);
+                    conexion.cerrarConec();
+
+                    Integer cc = Integer.valueOf(result[0]);
+                    String password = result[2];
+
                     if (Integer.valueOf(cctf.getText()).equals(cc) && validarPass.equals(password)){
                         System.out.println("Correcto");
                         Bienvenido n = new Bienvenido();
+                        n.setNombre(result[1]);
                         jFrame.setVisible(false);
                     }
                     else {
